@@ -36,7 +36,8 @@ isPalindrom('Лёша на полке клопа нашёл '); // true
 function findDigits(string) {
   let result = '';
   if (typeof(string) !== String) {
-    string = string + '';
+    //string = string + '';  // почему-то ругается =(
+    string = (string).toString();
   }
 
   for (let i = 0; i < string.length; i++) {
