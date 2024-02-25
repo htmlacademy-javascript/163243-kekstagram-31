@@ -43,43 +43,50 @@ const getRandomArrayElement = (elements) => elements[getRandomInteger(0, element
  * @param {array} textArray - массив с текстом из которого выбираем предложения.
  * @returns {string} - возвращает строку из 1 или 2 предложений
  */
-const getRandomText = (textArray) => Array.from({length: getRandomInteger(1,2)}, getRandomArrayElement(textArray.split('\n'))).join(' ');
+const getRandomText = (textArray) => Array.from({length: getRandomInteger(1,2)}, () => getRandomArrayElement(textArray.split('\n'))).join(' ');
+
+/**
+ * Функция для генератоции уникальных возрастающих ID
+ * @returns {integer} - возвращает новый идентификатор.
+ */
+const createIdGenerator = () => {
+  let lastGeneratedId = 0;
+  return function () {
+    lastGeneratedId ++;
+    return lastGeneratedId;
+  };
+};
+
+// счетчики для ID фото и комментариев
+const currentId = createIdGenerator();
+const currentCommentId = createIdGenerator();
 
 /**
  * Создание комментария к фото
  * @returns {obj} - возвращает объект комментария.
  */
-const createComment = () => {
-  const lastUsedCommentId = 0;
-  return () => {
-    const currentCommentId = lastUsedCommentId + 1;
-    return {
-      id: currentCommentId,
-      avatar: `img/avatar-${getRandomInteger(AVATAR_ID_MIN, AVATAR_ID_MAX)}.svg`,
-      message: `${getRandomText(COMMENT_TEXT_FISH)}`,
-      name: `${getRandomArrayElement(NAMES)}`,
-    };
-  };
-};
+const createComment = () =>
+  ({
+    id: currentCommentId(),
+    avatar: `img/avatar-${getRandomInteger(AVATAR_ID_MIN, AVATAR_ID_MAX)}.svg`,
+    message: `${getRandomText(COMMENT_TEXT_FISH)}`,
+    name: `${getRandomArrayElement(NAMES)}`,
+  });
 
 /**
  * Создание карточки фотографии
  * @returns {obj} - возвращает объект карточки.
  */
-const createPhotoCard = () => {
-  const lastUsedId = 0;
-  return () => {
-    const currentId = lastUsedId + 1;
-    return {
-      id: currentId,
-      url: `photos/${currentId}.jpg`,
-      description: `${getRandomText(DESCRIPTION_TEXT_FISH)}`,
-      likes: getRandomInteger(LIKES_COUNT_MIN, LIKES_COUNT_MAX),
-      comments: Array.from({length: getRandomInteger(COMMENTS_COUNT_MIN, COMMENTS_COUNT_MAX), createComment}),
-    };
-  };
-};
+const createPhotoCard = () =>
+  // const currentId = createIdGenerator();
+  ({
+    id: currentId(),
+    url: `photos/${currentId()}.jpg`,
+    description: `${getRandomText(DESCRIPTION_TEXT_FISH)}`,
+    likes: getRandomInteger(LIKES_COUNT_MIN, LIKES_COUNT_MAX),
+    comments: Array.from({length: getRandomInteger(COMMENTS_COUNT_MIN, COMMENTS_COUNT_MAX)}, createComment),
+  });
 
 const generatedPhotos = Array.from({length: IMAGES_COUNT}, createPhotoCard);
 
-console.log(generatedPhotos);
+console.log(generatedPhotos[2]);
