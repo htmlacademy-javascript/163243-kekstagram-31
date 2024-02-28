@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм»
 
 * Студент: [Диман Смирнов](https://up.htmlacademy.ru/javascript/31/user/163243).
-* Наставник: `Антон Попов`.
+* Наставник: [Антон Попов](https://htmlacademy.ru/profile/joker).
 
 ---
 

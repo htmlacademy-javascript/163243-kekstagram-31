@@ -104,3 +104,4 @@ const generatePhotos = (countPhotos) => Array.from({length: countPhotos}, create
 
 const generatedPhotos = generatePhotos(IMAGES_COUNT);
 // console.log(generatedPhotos[2]);
+
