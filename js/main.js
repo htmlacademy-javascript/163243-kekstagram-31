@@ -1,4 +1,4 @@
-import {generatePhotos} from './js/data';
+import {generatePhotos} from '../js/mocks/data.js';
 
 const IMAGES_COUNT = 25;
 

@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomArrayElement, getRandomText, createIdGenerator} from './js/util.js';
+import {getRandomInteger, getRandomArrayElement, getRandomText, createIdGenerator} from '../mocks/util.js';
 
 const LikesCount = {
   MIN: 15,
