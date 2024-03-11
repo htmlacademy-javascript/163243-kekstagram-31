@@ -1,5 +1,6 @@
-import {generatePhotos} from './js/data';
+import { generatePhotos } from '../js/mocks/data.js';
+import { createThumbs } from './create-thumbs.js';
 
 const IMAGES_COUNT = 25;
 
-generatePhotos(IMAGES_COUNT);
+createThumbs(generatePhotos(IMAGES_COUNT));
