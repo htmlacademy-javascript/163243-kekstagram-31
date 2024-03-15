@@ -9,15 +9,16 @@ const renderThumbs = (images) => {
 
   images.forEach(({url, description, likes, comments}) => {
     const photoCard = imageTemplate.cloneNode(true);
-    const imageEl = photoCard.querySelector('.picture__img');
-    imageEl.src = url;
-    imageEl.alt = description;
+    const imageElement = photoCard.querySelector('.picture__img');
+    imageElement.src = url;
+    imageElement.alt = description;
     photoCard.querySelector('.picture__likes').textContent = likes;
     photoCard.querySelector('.picture__comments').textContent = comments.length;
     imagesFragment.appendChild(photoCard);
   });
 
   imageContainer.appendChild(imagesFragment);
+  return imageContainer;
 };
 
 export { renderThumbs };

@@ -1,6 +1,10 @@
 import { generatePhotos } from './mocks/data.js';
-import { renderThumbs } from './create-thumbs.js';
+// import { renderThumbs } from './render-thumbs.js';
+import { renderGallery } from './gallery.js';
 
 const IMAGES_COUNT = 25;
 
-renderThumbs(generatePhotos(IMAGES_COUNT));
+const mockPhotoCards = generatePhotos(IMAGES_COUNT);
+
+// renderThumbs(mockPhotoCards);
+renderGallery(mockPhotoCards);
