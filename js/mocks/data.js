@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomArrayElement, getRandomText, createIdGenerator} from '../mocks/util.js';
+import { getRandomInteger, getRandomArrayElement, getRandomText, createIdGenerator } from './util.js';
 
 const LikesCount = {
   MIN: 15,
@@ -68,5 +68,5 @@ const createPhotoCard = () => {
  */
 const generatePhotos = (countPhotos) => Array.from({length: countPhotos}, createPhotoCard);
 
-export {generatePhotos};
+export { generatePhotos };
 
