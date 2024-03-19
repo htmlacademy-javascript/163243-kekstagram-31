@@ -1,4 +1,4 @@
-import { renderFullImage } from './render-full-image.js';
+import { renderFullImage } from './full-image.js';
 import { renderThumbs } from './render-thumbs.js';
 
 /**
@@ -7,8 +7,9 @@ import { renderThumbs } from './render-thumbs.js';
  * @param {event} evt - событие
  * @returns {null}
  */
-const thumbClickHandler = (comments, evt) => {
-  renderFullImage(evt.target, comments[evt.target.dataset.id]);
+const thumbClick = (imagesData, evt) => {
+  const clickedImageData = imagesData.find((el) => el['id'] === parseInt(evt.target.dataset.id, 10));
+  renderFullImage(clickedImageData);
 };
 
 /**
@@ -16,9 +17,9 @@ const thumbClickHandler = (comments, evt) => {
  * @param {array} images - массив объектов карточек фото.
  * @returns {null}
  */
-const renderGallery = (images) => {
-  const [gallery, comments] = renderThumbs(images);
-  gallery.addEventListener('click', (evt) => thumbClickHandler(comments, evt));
+const renderGallery = (imagesData) => {
+  const gallery = renderThumbs(imagesData);
+  gallery.addEventListener('click', (evt) => thumbClick(imagesData, evt));
 };
 
 export { renderGallery };
