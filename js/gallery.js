@@ -8,8 +8,10 @@ import { renderThumbs } from './render-thumbs.js';
  * @returns {null}
  */
 const thumbClick = (imagesData, evt) => {
-  const clickedImageData = imagesData.find((el) => el['id'] === parseInt(evt.target.dataset.id, 10));
-  fillFullImageData(clickedImageData);
+  if (evt.target.matches('.picture__img')) {
+    const clickedImageData = imagesData.find((el) => el['id'] === parseInt(evt.target.dataset.id, 10));
+    fillFullImageData(clickedImageData);
+  }
 };
 
 /**
