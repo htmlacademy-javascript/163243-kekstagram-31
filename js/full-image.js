@@ -18,11 +18,11 @@ let currentCount = 0;
 /**
  * Функция для очистки дефолтных комментариев
  */
-function clearComments() {
+const clearComments = () => {
   while (bigPictureCommentsElement.lastElementChild) {
     bigPictureCommentsElement.removeChild(bigPictureCommentsElement.lastElementChild);
   }
-}
+};
 
 
 /**
@@ -32,6 +32,7 @@ const closeFullImage = () => {
   bigPictureCloseElement.parentElement.parentElement.classList.add('hidden');
   document.removeEventListener('keydown', documentKeydownHandler);
   commentsLoaderElement.removeEventListener('click', commentsLoaderClickHandler);
+  bigPictureCloseElement.removeEventListener('click', closeElementClickHandler);
   document.body.classList.remove('modal-open');
 };
 
@@ -48,11 +49,19 @@ function documentKeydownHandler(evt) {
 
 
 /**
+ * Обработчик нажатия на элемент закрытия полного окна
+ */
+function closeElementClickHandler() {
+  closeFullImage();
+}
+
+
+/**
  * Функция генерации html кода одного комментария
  * @param {str} avatar - пусть до аватарки автора
  * @param {str} nickname - имя автора
  * @param {str} commentText - текст комментация
- * @returns {} - html код одного комментария
+ * @returns {HTMLElement} - html код одного комментария
  */
 const renderComment = (avatar, nickname, commentText) => {
   const comment = commentTemplateElement.cloneNode(true);
@@ -92,10 +101,13 @@ const openFullImage = (clickedImageDataComments) => {
   bigPictureElement.classList.remove('hidden');
   document.addEventListener('keydown', documentKeydownHandler);
   document.body.classList.add('modal-open');
-  bigPictureCloseElement.addEventListener('click', closeFullImage);
+  bigPictureCloseElement.addEventListener('click', closeElementClickHandler);
   renderImageComments();
 };
 
+/**
+ * Обработчик нажатия на кнопку загрузки дополнитеьных комментариев
+ */
 function commentsLoaderClickHandler() {
   currentCount += DEFAUT_COMMENTS_COUNT_SHOW;
   renderImageComments();
@@ -106,7 +118,7 @@ function commentsLoaderClickHandler() {
  * Функция отрисовки большого изображения фото
  * @param {array} clickedImageComments - массив комментариев к картинке
  */
-const renderFullImage = (clickedImageData) => {
+const fillFullImageData = (clickedImageData) => {
   bigPictureImageElement.src = clickedImageData.url;
   bigPicturePreviewElement.querySelector('.likes-count').textContent = clickedImageData.likes;
   bigPicturePreviewElement.querySelector('.social__comment-total-count').textContent = clickedImageData.comments.length;
@@ -116,5 +128,5 @@ const renderFullImage = (clickedImageData) => {
 };
 
 
-export { renderFullImage };
+export { fillFullImageData };
 

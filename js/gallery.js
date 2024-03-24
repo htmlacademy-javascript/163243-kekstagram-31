@@ -1,4 +1,4 @@
-import { renderFullImage } from './full-image.js';
+import { fillFullImageData } from './full-image.js';
 import { renderThumbs } from './render-thumbs.js';
 
 /**
@@ -9,7 +9,7 @@ import { renderThumbs } from './render-thumbs.js';
  */
 const thumbClick = (imagesData, evt) => {
   const clickedImageData = imagesData.find((el) => el['id'] === parseInt(evt.target.dataset.id, 10));
-  renderFullImage(clickedImageData);
+  fillFullImageData(clickedImageData);
 };
 
 /**
