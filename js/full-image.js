@@ -29,7 +29,7 @@ const clearComments = () => {
  * Функция закрытия просмотра большого изображения
  */
 const closeFullImage = () => {
-  bigPictureCloseElement.parentElement.parentElement.classList.add('hidden');
+  bigPictureElement.classList.add('hidden');
   document.removeEventListener('keydown', documentKeydownHandler);
   commentsLoaderElement.removeEventListener('click', commentsLoaderClickHandler);
   bigPictureCloseElement.removeEventListener('click', closeElementClickHandler);
