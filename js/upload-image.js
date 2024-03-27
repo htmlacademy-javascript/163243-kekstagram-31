@@ -1,4 +1,5 @@
 import { isEscapeKey } from './util.js';
+import { handleScale } from './scale.js';
 
 const HASHTAGS_COUNT_LIMIT = 5;
 const DESCRIPTION_LENGTH_LIMIT = 140;
@@ -123,12 +124,13 @@ const handleImageUpload = () => {
 
   Validations.forEach((elem) => pristine.addValidator(elem[0],elem[1],elem[2]));
 
+  uploadedImageEditFormElement.addEventListener('submit', () => {
+    // evt.preventDefault();
+    pristine.validate();
+  });
+
+  handleScale();
 };
 
-
-uploadedImageEditFormElement.addEventListener('submit', () => {
-  // evt.preventDefault();
-  pristine.validate();
-});
 
 export { handleImageUpload };
