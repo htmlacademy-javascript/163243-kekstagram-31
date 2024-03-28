@@ -4,8 +4,6 @@ import { handleEffects } from './effects.js';
 
 const HASHTAGS_COUNT_LIMIT = 5;
 const DESCRIPTION_LENGTH_LIMIT = 140;
-
-const Validations = [];
 const HASHTAG_REGEXP = /^#[a-zа-яё0-9]{1,19}$/i;
 
 const imageUploadElement = document.querySelector('.img-upload');
@@ -118,12 +116,14 @@ const handleImageUpload = () => {
    */
   const validateDescription = (description) => description.length <= DESCRIPTION_LENGTH_LIMIT;
 
-  Validations.push([inputHashtagsElement, validateHashtagsRegexp, 'Хештеги должны начинаться с #, содержать 1-19 букв без спецсимволов']);
-  Validations.push([inputHashtagsElement, validateHashtagsDuplicates, 'Хештеги не должны повторяться']);
-  Validations.push([inputHashtagsElement, validateHashtagsCount, 'Не более 5 хештегов']);
-  Validations.push([inputDescriptionElement, validateDescription, 'Ограничение 140 символов для описания']);
+  const validations = [
+    [inputHashtagsElement, validateHashtagsRegexp, 'Хештеги должны начинаться с #, содержать 1-19 букв без спецсимволов'],
+    [inputHashtagsElement, validateHashtagsDuplicates, 'Хештеги не должны повторяться'],
+    [inputHashtagsElement, validateHashtagsCount, 'Не более 5 хештегов'],
+    [inputDescriptionElement, validateDescription, 'Ограничение 140 символов для описания'],
+  ];
 
-  Validations.forEach((elem) => pristine.addValidator(elem[0],elem[1],elem[2]));
+  validations.forEach(([element, validation, errorText]) => pristine.addValidator(element, validation, errorText));
 
   uploadedImageEditFormElement.addEventListener('submit', () => {
     // evt.preventDefault();
