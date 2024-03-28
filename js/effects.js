@@ -4,23 +4,22 @@ const imagePreviewElement = document.querySelector('.img-upload__preview');
 const effectsListElement = document.querySelector('.effects__list');
 const effectBarElement = document.querySelector('.img-upload__effect-level');
 
-const DefaultSliderSettings = {MIN: 0, MAX: 1, START: 1, STEP: 0.01, CONNECT: 'lower',};
+const defaultSliderSettings = { range: { min: 0, max: 1 }, start: 1, step: 0.01, connect: 'lower' };
 
 const EffectsSettings = {
-  chrome: {filter: 'grayscale', min: 0, max: 1, start: 1, step: 0.01, unit: '',},
-  sepia:  {filter: 'sepia', min: 0, max: 1, start: 1, step: 0.01, unit: '',},
-  marvin: {filter: 'invert', min: 0, max: 1, start: 1, step: 0.01,unit: '%',},
-  phobos: {filter: 'blur', min: 0, max: 3, start: 3, step: 0.01, unit: 'px',},
-  heat:   {filter: 'brightness', min: 1, max: 3, start: 3, step: 0.01, unit: '',},
+  chrome: {filter: 'grayscale', range: { min: 0, max: 1 }, start: 1, step: 0.01, unit: '' },
+  sepia:  {filter: 'sepia', range: { min: 0, max: 1 }, start: 1, step: 0.01, unit: '' },
+  marvin: {filter: 'invert', range: { min: 0, max: 1 }, start: 1, step: 0.01,unit: '%' },
+  phobos: {filter: 'blur', range: { min: 0, max: 3 }, start: 3, step: 0.01, unit: 'px' },
+  heat:   {filter: 'brightness', range: { min: 1, max: 3 }, start: 3, step: 0.01, unit: '' },
 };
 
 /**
  * Иницилиазация слайдера
  */
 const initSlider = () => {
-  const {MIN, MAX, START, STEP, CONNECT} = DefaultSliderSettings;
-  noUiSlider.create(sliderElement, {
-    range: {min: MIN, max: MAX }, start: START, step: STEP, connect: CONNECT,
+  const { range, start, step, connect} = defaultSliderSettings;
+  noUiSlider.create(sliderElement, { range, start, step, connect,
     format: {
       to: function (value) {
         if (Number.isInteger(value)) {
@@ -51,11 +50,11 @@ const resetEffects = () => {
  * @param {string} selectedEffect - строковое значение выбранного эффекта
  */
 const setEffect = (selectedEffect) => {
-  const {min, max, start, step, filter, unit} = EffectsSettings[selectedEffect];
+  const { range, start, step, filter, unit } = EffectsSettings[selectedEffect];
   effectBarElement.classList.remove('hidden');
-  sliderElement.noUiSlider.updateOptions({range: { min, max }, start, step,});
+  sliderElement.noUiSlider.updateOptions({ range, start, step });
   sliderElement.noUiSlider.on('update', () => {
-    imagePreviewElement.style.filter = `${filter}(${sliderValueElement.value}${unit})`;
+    imagePreviewElement.style.filter = `${ filter }(${ sliderValueElement.value }${ unit })`;
   });
 };
 
