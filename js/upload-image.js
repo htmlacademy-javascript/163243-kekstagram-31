@@ -1,5 +1,6 @@
 import { isEscapeKey } from './util.js';
 import { handleScale } from './scale.js';
+import { handleEffects } from './effects.js';
 
 const HASHTAGS_COUNT_LIMIT = 5;
 const DESCRIPTION_LENGTH_LIMIT = 140;
@@ -130,6 +131,7 @@ const handleImageUpload = () => {
   });
 
   handleScale();
+  handleEffects();
 };
 
 

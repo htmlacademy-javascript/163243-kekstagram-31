@@ -1,8 +1,4 @@
-const ScaleProperties = {
-  MIN: 25,
-  MAX: 100,
-  STEP: 25
-};
+const ScaleProperties = {MIN: 25, MAX: 100, STEP: 25};
 
 const increaseScaleElement = document.querySelector('.scale__control--smaller');
 const decreaseScaleElement = document.querySelector('.scale__control--bigger');
