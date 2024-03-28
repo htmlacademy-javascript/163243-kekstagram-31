@@ -1,13 +1,16 @@
 import { isEscapeKey } from './util.js';
+import { handleScale } from './scale.js';
+import { handleEffects } from './effects.js';
 
 const HASHTAGS_COUNT_LIMIT = 5;
 const DESCRIPTION_LENGTH_LIMIT = 140;
+const HASHTAG_REGEXP = /^#[a-zа-яё0-9]{1,19}$/i;
 
 const imageUploadElement = document.querySelector('.img-upload');
 const uploadedImageEditOverlayElement = imageUploadElement.querySelector('.img-upload__overlay');
 const uploadedImageEditFormElement = imageUploadElement.querySelector('.img-upload__form');
 const closeUploadedImageEditFormElement = imageUploadElement.querySelector('.img-upload__cancel');
-const inputImageFileUploadElement = imageUploadElement.querySelector('.img-upload__input');
+// const inputImageFileUploadElement = imageUploadElement.querySelector('.img-upload__input');
 const inputHashtagsElement = imageUploadElement.querySelector('.text__hashtags');
 const inputDescriptionElement = imageUploadElement.querySelector('.text__description');
 
@@ -17,14 +20,9 @@ const pristine = new Pristine(uploadedImageEditFormElement, {
   errorTextClass: 'img-upload__field-wrapper--error',
 }, false);
 
-/**
- * Функция очистки полей ввода формы загруженного изображения
- */
-const clearImageUploadFormInputs = () => {
-  inputImageFileUploadElement.value = '';
-  inputHashtagsElement.value = '';
-  inputDescriptionElement.value = '';
-};
+
+const hashtagChangeHandler = () => pristine.validate();
+const stopKeydownHandler = (evt) => evt.stopPropagation();
 
 /**
  * Обработчки события загрузки изображения
@@ -34,10 +32,9 @@ const uploadImageHandler = () => {
   document.body.classList.add('modal-open');
   closeUploadedImageEditFormElement.addEventListener('click', closeElementClickHandler);
   document.addEventListener('keydown', documentKeydownHandler);
+
 };
 
-const hashtagChangeHandler = () => pristine.validate();
-const stopKeydownHandler = (evt) => evt.stopPropagation();
 
 /**
  * Функция закрытия формы редактирования загруженного изображения
@@ -47,11 +44,8 @@ const closeImageUploadForm = () => {
   document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', documentKeydownHandler);
   closeUploadedImageEditFormElement.removeEventListener('click', closeElementClickHandler);
-  inputHashtagsElement.removeEventListener('change', hashtagChangeHandler);
-  inputHashtagsElement.removeEventListener('keydown', stopKeydownHandler);
-  inputDescriptionElement.removeEventListener('keydown', stopKeydownHandler);
-  clearImageUploadFormInputs();
-  pristine.destroy();
+  uploadedImageEditFormElement.reset();
+  pristine.reset();
 };
 
 /**
@@ -79,12 +73,13 @@ function documentKeydownHandler(evt) {
  */
 const handleImageUpload = () => {
 
-  imageUploadElement.addEventListener('change', uploadImageHandler);
   inputHashtagsElement.addEventListener('input', hashtagChangeHandler);
   inputHashtagsElement.addEventListener('keydown', stopKeydownHandler);
   inputDescriptionElement.addEventListener('keydown', stopKeydownHandler);
+  imageUploadElement.addEventListener('change', uploadImageHandler);
 
   let clearedHashtagsToValidate = [];
+
 
   /**
    * Валидация хештегов на соответвтие регулярному выражению
@@ -92,16 +87,15 @@ const handleImageUpload = () => {
    * @returns {boolean} - правда, если все хештеги соответствуют регулярке (иначе - ложь)
    */
   const validateHashtagsRegexp = (hashtags) => {
-    const hashtagRegexp = /^#[a-zа-яё0-9]{1,19}$/i;
     const hashtagsToValidate = hashtags.trim().toLowerCase().split(' ');
     clearedHashtagsToValidate = hashtagsToValidate.filter(Boolean);
-    return clearedHashtagsToValidate.every((hashtag) => hashtagRegexp.test(hashtag));
+    return clearedHashtagsToValidate.every((hashtag) => HASHTAG_REGEXP.test(hashtag));
   };
 
   /**
-   * Проверка, что нет дубликатов в хештегах
-   * @returns {boolean} - правда, если дубликатов нет, иначе - ложь
-   */
+ * Проверка, что нет дубликатов в хештегах
+ * @returns {boolean} - правда, если дубликатов нет, иначе - ложь
+ */
   const validateHashtagsDuplicates = () => {
     if (clearedHashtagsToValidate) {
       const duplicates = clearedHashtagsToValidate.filter((element, index, elements) => elements.indexOf(element) !== index);
@@ -122,36 +116,23 @@ const handleImageUpload = () => {
    */
   const validateDescription = (description) => description.length <= DESCRIPTION_LENGTH_LIMIT;
 
-  pristine.addValidator(
-    inputHashtagsElement,
-    validateHashtagsRegexp,
-    'Хештеги должны начинаться с #, содержать 1-19 букв без спецсимволов'
-  );
+  const validations = [
+    [inputHashtagsElement, validateHashtagsRegexp, 'Хештеги должны начинаться с #, содержать 1-19 букв без спецсимволов'],
+    [inputHashtagsElement, validateHashtagsDuplicates, 'Хештеги не должны повторяться'],
+    [inputHashtagsElement, validateHashtagsCount, 'Не более 5 хештегов'],
+    [inputDescriptionElement, validateDescription, 'Ограничение 140 символов для описания'],
+  ];
 
-  pristine.addValidator(
-    inputHashtagsElement,
-    validateHashtagsDuplicates,
-    'Хештеги не должны повторяться'
-  );
+  validations.forEach(([element, validation, errorText]) => pristine.addValidator(element, validation, errorText));
 
-  pristine.addValidator(
-    inputHashtagsElement,
-    validateHashtagsCount,
-    'Не более 5 хештегов'
-  );
+  uploadedImageEditFormElement.addEventListener('submit', () => {
+    // evt.preventDefault();
+    pristine.validate();
+  });
 
-  pristine.addValidator(
-    inputDescriptionElement,
-    validateDescription,
-    'Ограничение 140 символов для описания'
-  );
-
+  handleScale();
+  handleEffects();
 };
 
-
-uploadedImageEditFormElement.addEventListener('submit', () => {
-  // evt.preventDefault();
-  pristine.validate();
-});
 
 export { handleImageUpload };
