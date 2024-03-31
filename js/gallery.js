@@ -3,9 +3,8 @@ import { renderThumbs } from './render-thumbs.js';
 
 /**
  * Функция обработки клика по превью картинки
- * @param {array} comments - массив с комментариями всех фото
+ * @param {array} imagesData - массив с данными фотографий
  * @param {event} evt - событие
- * @returns {null}
  */
 const thumbClick = (imagesData, evt) => {
   if (evt.target.matches('.picture__img')) {
@@ -16,7 +15,7 @@ const thumbClick = (imagesData, evt) => {
 
 /**
  * Функция отрисовки галерии изображений
- * @param {array} images - массив объектов карточек фото.
+ * @param {array} imagesData - массив с данными фотографий
  * @returns {null}
  */
 const renderGallery = (imagesData) => {

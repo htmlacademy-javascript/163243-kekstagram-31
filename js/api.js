@@ -1,5 +1,6 @@
 import { renderGallery } from './gallery.js';
 import { isEscapeKey } from './util.js';
+import { closeImageUploadForm } from './upload-image.js';
 
 const getDataErrorElementTemplate = document.querySelector('#data-error').content.querySelector('.data-error');
 const getDataErrorElement = getDataErrorElementTemplate.cloneNode(true);
@@ -9,6 +10,7 @@ const sendDataSuccessElementTemplate = document.querySelector('#success').conten
 const sendDataSuccessElement = sendDataSuccessElementTemplate.cloneNode(true);
 const successButtonElement = sendDataSuccessElement.querySelector('.success__button');
 const errorButtonElement = sendDataErrorElement.querySelector('.error__button');
+const imageUploadSubmitButtonElement = document.querySelector('.img-upload__submit');
 
 
 const BACKEND_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
@@ -31,26 +33,63 @@ const api = {
   },
 };
 
-const closeDataSuccess = () => {
+/**
+ * Функция блокировки кнопки отправки формы
+ */
+const blockSubmitButton = () => {
+  imageUploadSubmitButtonElement.disabled = true;
+};
+
+/**
+ * Функция разблокировки кнопки отправки формы
+ */
+const unblockSubmitButton = () => {
+  imageUploadSubmitButtonElement.disabled = false;
+};
+
+/**
+ * Функция закрытия сообщения об успешной отправке данных
+ */
+const closeDataSuccessMsg = () => {
   document.body.removeChild(sendDataSuccessElement);
   document.removeEventListener('keydown', documentKeydownHandler);
   document.removeEventListener('click', documentClickHandler);
   document.body.classList.remove('modal-open');
+  closeImageUploadForm();
 };
 
-const closeDataError = () => {
+/**
+ * Функция закрытия сообщения об ошибке отправки данных
+ */
+const closeDataErrorMsg = () => {
   document.body.removeChild(sendDataErrorElement);
   document.removeEventListener('keydown', documentKeydownHandler);
   document.removeEventListener('click', documentClickHandler);
   document.body.classList.remove('modal-open');
 };
 
+/**
+ * Обработчик нажатия на кнопку закрытия сообщения об успешной отправке данных
+ */
+const successButtonClickHandler = () => closeDataSuccessMsg();
 
-const successButtonClickHandler = () => closeDataSuccess();
-const errorButtonClickHandler = () => closeDataError();
+/**
+ * Обработчик нажатия на кнопку закрытия сообщения об ошибке отправке данных
+ */
+const errorButtonClickHandler = () => closeDataErrorMsg();
 
-function documentClickHandler() {
-  const _ = (sendDataSuccessElement.parentNode !== null) ? closeDataSuccess() : closeDataError();
+/**
+ * Обработчик клика по документу
+ * @param {evt} evt - событие
+ */
+function documentClickHandler(evt) {
+  if (sendDataSuccessElement.parentNode !== null && !evt.target.matches('.success__inner') && !evt.target.matches('.success__title')) {
+    closeDataSuccessMsg();
+  } else {
+    if (sendDataErrorElement.parentNode !== null && !evt.target.matches('.error__inner') && !evt.target.matches('.error__title')) {
+      closeDataErrorMsg();
+    }
+  }
 }
 
 
@@ -61,14 +100,14 @@ function documentClickHandler() {
 function documentKeydownHandler(evt) {
   if (isEscapeKey(evt)) {
     evt.preventDefault();
-    const _ = (sendDataSuccessElement.parentNode !== null) ? closeDataSuccess() : closeDataError();
+    const _ = (sendDataSuccessElement.parentNode !== null) ? closeDataSuccessMsg() : closeDataErrorMsg();
   }
 }
 
 
 /**
  * Функция, показывающая сообщение об ошибке загрузки данных
- * @param {int} timeout - сколько секунда показываем сообщение об ошибке
+ * @param {HTMLElement} errorElement - элемент сообщения об ошибке
  */
 const showDataError = (errorElement) => {
   document.body.appendChild(errorElement);
@@ -82,6 +121,9 @@ const showDataError = (errorElement) => {
   document.body.classList.add('modal-open');
 };
 
+/**
+ * Функция, показывающая сообщение об успешной отправке данных на сервер
+ */
 const showDataSuccess = () => {
   document.body.appendChild(sendDataSuccessElement);
   successButtonElement.addEventListener('click', successButtonClickHandler);
@@ -93,10 +135,11 @@ const showDataSuccess = () => {
 /**
  * Функция отправки запроса на сервер
  * @param {obj} api - destructed - объект API
- * @param {obj} body - обект с данными для отправки на сервер
+ * @param {obj} body - обект с данными для отправки на сервер, по умолчанию null
  */
 const sendRequest = ({route, errorText, method, errorElement}, body = null) => {
   fetch(`${BACKEND_URL}${route}`, {method, body})
+    .then(blockSubmitButton())
     .then((response) => {
       if (!response.ok) {
         throw new Error();
@@ -104,16 +147,13 @@ const sendRequest = ({route, errorText, method, errorElement}, body = null) => {
       return response.json();
     })
     .then((data) => {
-      if (method === api.getData.method) {
-        renderGallery(data);
-      } else {
-        showDataSuccess();
-      }
+      const _ = (method === api.getData.method) ? renderGallery(data) : showDataSuccess();
     })
     .catch(() => {
       showDataError(errorElement);
       throw new Error(errorText);
-    });
+    })
+    .finally(unblockSubmitButton());
 };
 
 const getData = () => sendRequest(api.getData);

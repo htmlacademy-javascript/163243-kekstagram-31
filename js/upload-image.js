@@ -11,7 +11,6 @@ const imageUploadElement = document.querySelector('.img-upload');
 const uploadedImageEditOverlayElement = imageUploadElement.querySelector('.img-upload__overlay');
 const uploadedImageEditFormElement = imageUploadElement.querySelector('.img-upload__form');
 const closeUploadedImageEditFormElement = imageUploadElement.querySelector('.img-upload__cancel');
-// const inputImageFileUploadElement = imageUploadElement.querySelector('.img-upload__input');
 const inputHashtagsElement = imageUploadElement.querySelector('.text__hashtags');
 const inputDescriptionElement = imageUploadElement.querySelector('.text__description');
 
@@ -22,7 +21,15 @@ const pristine = new Pristine(uploadedImageEditFormElement, {
 }, false);
 
 
+/**
+ * Обработчик вводимых хештегов
+ */
 const hashtagChangeHandler = () => pristine.validate();
+
+/**
+ * Обработчик нажатия клавиш
+ * @param {evt} evt - событие
+ */
 const stopKeydownHandler = (evt) => evt.stopPropagation();
 
 /**
@@ -33,7 +40,6 @@ const uploadImageHandler = () => {
   document.body.classList.add('modal-open');
   closeUploadedImageEditFormElement.addEventListener('click', closeElementClickHandler);
   document.addEventListener('keydown', documentKeydownHandler);
-
 };
 
 
@@ -60,7 +66,7 @@ function closeElementClickHandler() {
 
 
 /**
- * Функция обработки нажатия клавиши Esc
+ * Обработчик нажатия клавиши Esc
  * @param {evt} evt - событие.
  */
 function documentKeydownHandler(evt) {
@@ -69,7 +75,6 @@ function documentKeydownHandler(evt) {
     closeImageUploadForm();
   }
 }
-
 
 /**
  * Функция - интерфейс модуля загрузки изображений
@@ -82,7 +87,6 @@ const handleImageUpload = () => {
   imageUploadElement.addEventListener('change', uploadImageHandler);
 
   let clearedHashtagsToValidate = [];
-
 
   /**
    * Валидация хештегов на соответвтие регулярному выражению
@@ -131,7 +135,7 @@ const handleImageUpload = () => {
   uploadedImageEditFormElement.addEventListener('submit', (evt) => {
     evt.preventDefault();
     if (pristine.validate()) {
-      sendData();
+      sendData(new FormData(evt.target));
     }
   });
 
@@ -140,4 +144,4 @@ const handleImageUpload = () => {
 };
 
 
-export { handleImageUpload };
+export { handleImageUpload, closeImageUploadForm };
