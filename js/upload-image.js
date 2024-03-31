@@ -1,6 +1,7 @@
 import { isEscapeKey } from './util.js';
-import { handleScale } from './scale.js';
-import { handleEffects } from './effects.js';
+import { handleScale, resetScale } from './scale.js';
+import { handleEffects, resetEffects } from './effects.js';
+import { sendData } from './api.js';
 
 const HASHTAGS_COUNT_LIMIT = 5;
 const DESCRIPTION_LENGTH_LIMIT = 140;
@@ -45,6 +46,8 @@ const closeImageUploadForm = () => {
   document.removeEventListener('keydown', documentKeydownHandler);
   closeUploadedImageEditFormElement.removeEventListener('click', closeElementClickHandler);
   uploadedImageEditFormElement.reset();
+  resetEffects();
+  resetScale();
   pristine.reset();
 };
 
@@ -125,9 +128,11 @@ const handleImageUpload = () => {
 
   validations.forEach(([element, validation, errorText]) => pristine.addValidator(element, validation, errorText));
 
-  uploadedImageEditFormElement.addEventListener('submit', () => {
-    // evt.preventDefault();
-    pristine.validate();
+  uploadedImageEditFormElement.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    if (pristine.validate()) {
+      sendData();
+    }
   });
 
   handleScale();

@@ -79,4 +79,4 @@ const handleEffects = () => {
   effectsListElement.addEventListener('change', effectClickHandler);
 };
 
-export { handleEffects };
+export { handleEffects, resetEffects };

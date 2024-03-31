@@ -19,6 +19,12 @@ const scaleChangeClickHandler = (evt) => {
 };
 
 /**
+ * Функция сброса настроек масштаба
+ *
+ */
+const resetScale = () => imagePreviewElement.removeAttribute('style');
+
+/**
  * Функция - интерфейс модуля управления масштабом картинки
  */
 const handleScale = () => {
@@ -26,4 +32,4 @@ const handleScale = () => {
   increaseScaleElement.addEventListener('click', scaleChangeClickHandler);
 };
 
-export { handleScale };
+export { handleScale, resetScale };
