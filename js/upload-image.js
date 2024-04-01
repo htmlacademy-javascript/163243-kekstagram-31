@@ -1,6 +1,7 @@
 import { isEscapeKey } from './util.js';
-import { handleScale } from './scale.js';
-import { handleEffects } from './effects.js';
+import { handleScale, resetScale } from './scale.js';
+import { handleEffects, resetEffects } from './effects.js';
+import { sendData } from './api.js';
 
 const HASHTAGS_COUNT_LIMIT = 5;
 const DESCRIPTION_LENGTH_LIMIT = 140;
@@ -10,7 +11,6 @@ const imageUploadElement = document.querySelector('.img-upload');
 const uploadedImageEditOverlayElement = imageUploadElement.querySelector('.img-upload__overlay');
 const uploadedImageEditFormElement = imageUploadElement.querySelector('.img-upload__form');
 const closeUploadedImageEditFormElement = imageUploadElement.querySelector('.img-upload__cancel');
-// const inputImageFileUploadElement = imageUploadElement.querySelector('.img-upload__input');
 const inputHashtagsElement = imageUploadElement.querySelector('.text__hashtags');
 const inputDescriptionElement = imageUploadElement.querySelector('.text__description');
 
@@ -21,7 +21,15 @@ const pristine = new Pristine(uploadedImageEditFormElement, {
 }, false);
 
 
+/**
+ * Обработчик вводимых хештегов
+ */
 const hashtagChangeHandler = () => pristine.validate();
+
+/**
+ * Обработчик нажатия клавиш
+ * @param {evt} evt - событие
+ */
 const stopKeydownHandler = (evt) => evt.stopPropagation();
 
 /**
@@ -32,7 +40,6 @@ const uploadImageHandler = () => {
   document.body.classList.add('modal-open');
   closeUploadedImageEditFormElement.addEventListener('click', closeElementClickHandler);
   document.addEventListener('keydown', documentKeydownHandler);
-
 };
 
 
@@ -45,6 +52,8 @@ const closeImageUploadForm = () => {
   document.removeEventListener('keydown', documentKeydownHandler);
   closeUploadedImageEditFormElement.removeEventListener('click', closeElementClickHandler);
   uploadedImageEditFormElement.reset();
+  resetEffects();
+  resetScale();
   pristine.reset();
 };
 
@@ -57,7 +66,7 @@ function closeElementClickHandler() {
 
 
 /**
- * Функция обработки нажатия клавиши Esc
+ * Обработчик нажатия клавиши Esc
  * @param {evt} evt - событие.
  */
 function documentKeydownHandler(evt) {
@@ -66,7 +75,6 @@ function documentKeydownHandler(evt) {
     closeImageUploadForm();
   }
 }
-
 
 /**
  * Функция - интерфейс модуля загрузки изображений
@@ -79,7 +87,6 @@ const handleImageUpload = () => {
   imageUploadElement.addEventListener('change', uploadImageHandler);
 
   let clearedHashtagsToValidate = [];
-
 
   /**
    * Валидация хештегов на соответвтие регулярному выражению
@@ -125,9 +132,11 @@ const handleImageUpload = () => {
 
   validations.forEach(([element, validation, errorText]) => pristine.addValidator(element, validation, errorText));
 
-  uploadedImageEditFormElement.addEventListener('submit', () => {
-    // evt.preventDefault();
-    pristine.validate();
+  uploadedImageEditFormElement.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    if (pristine.validate()) {
+      sendData(new FormData(evt.target));
+    }
   });
 
   handleScale();
@@ -135,4 +144,4 @@ const handleImageUpload = () => {
 };
 
 
-export { handleImageUpload };
+export { handleImageUpload, closeImageUploadForm };
