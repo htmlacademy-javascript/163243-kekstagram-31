@@ -2,6 +2,10 @@ import { renderGallery } from './gallery.js';
 import { isEscapeKey } from './util.js';
 import { closeImageUploadForm } from './upload-image.js';
 
+const BACKEND_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
+const TIME_OUT = 5;
+const MILLISECONDS_IN_SECONDS = 1000;
+
 const getDataErrorElementTemplate = document.querySelector('#data-error').content.querySelector('.data-error');
 const getDataErrorElement = getDataErrorElementTemplate.cloneNode(true);
 const sendDataErrorElementTemplate = document.querySelector('#error').content.querySelector('.error');
@@ -12,17 +16,13 @@ const successButtonElement = sendDataSuccessElement.querySelector('.success__but
 const errorButtonElement = sendDataErrorElement.querySelector('.error__button');
 const imageUploadSubmitButtonElement = document.querySelector('.img-upload__submit');
 
-
-const BACKEND_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
-const TIME_OUT = 5;
-const MILLISECONDS_IN_SECONDS = 1000;
-
 const api = {
   getData : {
     route: '/data',
     method: 'GET',
     errorText: 'Не удалось загрузить данные. Попробуйте обновить страницу',
     errorElement: getDataErrorElement,
+    action: (data) => renderGallery(data),
   },
   sendData : {
     route: '/',
@@ -30,6 +30,7 @@ const api = {
     errorText: 'Не удалось загрузить данные. Попробуйте обновить страницу',
     errorElement: sendDataErrorElement,
     successElement: sendDataSuccessElement,
+    action: () => showDataSuccess(),
   },
 };
 
@@ -46,6 +47,7 @@ const blockSubmitButton = () => {
 const unblockSubmitButton = () => {
   imageUploadSubmitButtonElement.disabled = false;
 };
+
 
 /**
  * Функция закрытия сообщения об успешной отправке данных
@@ -85,10 +87,8 @@ const errorButtonClickHandler = () => closeDataErrorMsg();
 function documentClickHandler(evt) {
   if (sendDataSuccessElement.parentNode !== null && !evt.target.matches('.success__inner') && !evt.target.matches('.success__title')) {
     closeDataSuccessMsg();
-  } else {
-    if (sendDataErrorElement.parentNode !== null && !evt.target.matches('.error__inner') && !evt.target.matches('.error__title')) {
-      closeDataErrorMsg();
-    }
+  } else if (sendDataErrorElement.parentNode !== null && !evt.target.matches('.error__inner') && !evt.target.matches('.error__title')) {
+    closeDataErrorMsg();
   }
 }
 
@@ -100,7 +100,11 @@ function documentClickHandler(evt) {
 function documentKeydownHandler(evt) {
   if (isEscapeKey(evt)) {
     evt.preventDefault();
-    const _ = (sendDataSuccessElement.parentNode !== null) ? closeDataSuccessMsg() : closeDataErrorMsg();
+    if (sendDataSuccessElement.parentNode !== null) {
+      closeDataSuccessMsg();
+    } else {
+      closeDataErrorMsg();
+    }
   }
 }
 
@@ -124,20 +128,21 @@ const showDataError = (errorElement) => {
 /**
  * Функция, показывающая сообщение об успешной отправке данных на сервер
  */
-const showDataSuccess = () => {
+function showDataSuccess() {
   document.body.appendChild(sendDataSuccessElement);
   successButtonElement.addEventListener('click', successButtonClickHandler);
   document.addEventListener('keydown', documentKeydownHandler);
   document.addEventListener('click', documentClickHandler);
   document.body.classList.add('modal-open');
-};
+}
+
 
 /**
  * Функция отправки запроса на сервер
  * @param {obj} api - destructed - объект API
  * @param {obj} body - обект с данными для отправки на сервер, по умолчанию null
  */
-const sendRequest = ({route, errorText, method, errorElement}, body = null) => {
+const sendRequest = ({route, method, errorElement, action}, body = null) => {
   fetch(`${BACKEND_URL}${route}`, {method, body})
     .then(blockSubmitButton())
     .then((response) => {
@@ -146,13 +151,8 @@ const sendRequest = ({route, errorText, method, errorElement}, body = null) => {
       }
       return response.json();
     })
-    .then((data) => {
-      const _ = (method === api.getData.method) ? renderGallery(data) : showDataSuccess();
-    })
-    .catch(() => {
-      showDataError(errorElement);
-      throw new Error(errorText);
-    })
+    .then((data) => action(data))
+    .catch(() => showDataError(errorElement))
     .finally(unblockSubmitButton());
 };
 
