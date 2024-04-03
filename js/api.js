@@ -111,6 +111,10 @@ function documentKeydownHandler(evt) {
   }
 }
 
+/**
+ * Обработчик нажатия на фильтр
+ * @param {evt} evt - событие
+ */
 const clickFilterHandler = (evt) => {
   const activeFilter = imageFiltersFormElement.querySelector('.img-filters__button--active');
   if (activeFilter !== evt.target) {
@@ -153,6 +157,7 @@ function showDataSuccess() {
  * Функция отправки запроса на сервер
  * @param {obj} api - destructed - объект API
  * @param {obj} body - обект с данными для отправки на сервер, по умолчанию null
+ * @param {string} - строка со значением фильтра
  */
 const sendRequest = ({route, method, errorElement, action}, body = null, filter = null) => {
   fetch(`${BACKEND_URL}${route}`, {method, body})
@@ -168,12 +173,20 @@ const sendRequest = ({route, method, errorElement, action}, body = null, filter 
     .finally(unblockSubmitButton());
 };
 
+/**
+ * Функция получения данных с сервера
+ * @param {string} chosenFilter - строка с установленным фильтром
+ */
 function getData(chosenFilter = 'default') {
   sendRequest(api.getData, null, chosenFilter);
   imageFiltersElement.classList.remove('img-filters--inactive');
   imageFiltersFormElement.addEventListener('click', debounce(clickFilterHandler));
 }
 
+/**
+ * Функция отправки данных на сервер
+ * @param {obj} body - объект с отправляемыми данными
+ */
 const sendData = (body) => sendRequest(api.sendData, body);
 
 export { getData, sendData };

@@ -18,9 +18,12 @@ const getRandomInteger = (a, b) => {
   return Math.floor(result);
 };
 
-// Функция взята из интернета и доработана
-// Источник - https://www.freecodecamp.org/news/javascript-debounce-example
-
+/**
+ * Функция устранения дребезга
+ * @param {fn} callback - колбэк, который оборачиваем
+ * @param {int} timeoutDelay - задержка в мс
+ * @returns {fn} - колбэк с задержкой
+ */
 function debounce (callback, timeoutDelay = 500) {
   let timeoutId;
 

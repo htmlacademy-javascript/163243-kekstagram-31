@@ -2,8 +2,19 @@ const RANDOM_CARD_LIMIT = 10;
 
 import { getRandomInteger } from './util.js';
 
+/**
+ * Функция сравнения количества комментариев для сортировки
+ * @param {obj} cardA - объект первой карточки фото
+ * @param {obj} cardB - объект второй карточки фото
+ * @returns {int} - результат сравнения
+ */
 const compareCommentsCount = (cardA, cardB) => cardB.comments.length - cardA.comments.length;
 
+/**
+ * Функция выборки случайных неповторяющихся элементов массива
+ * @param {array} cards - массив с карточками фото
+ * @returns {array} randomCards - массив случайных карточек фото
+ */
 const getRandomCards = (cards) => {
   const randomCards = [];
   const usedIndexes = [];
@@ -30,6 +41,7 @@ const filters = {
 /**
  * Функция для отрисовки превью картинок
  * @param {array} images - принимает на вход сгенерированные (или полученные от сервера) картинки в виде массива объектов
+ * @param {string} filter - строка с установленным фильтром
  */
 const renderThumbs = (images, filter) => {
   const imageTemplate = document.querySelector('#picture').content.querySelector('.picture');

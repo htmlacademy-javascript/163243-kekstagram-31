@@ -16,7 +16,7 @@ const thumbClick = (imagesData, evt) => {
 /**
  * Функция отрисовки галерии изображений
  * @param {array} imagesData - массив с данными фотографий
- * @returns {null}
+ * @param {string} filter - установленный фильтр
  */
 const renderGallery = (imagesData, filter) => {
   const gallery = renderThumbs(imagesData, filter);
