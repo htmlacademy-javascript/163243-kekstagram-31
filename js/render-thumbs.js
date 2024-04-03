@@ -1,10 +1,30 @@
+const RANDOM_CARD_LIMIT = 10;
 
-const compareComments = (cardA, cardB) => cardB.comments.length - cardA.comments.length;
+import { getRandomInteger } from './util.js';
+
+const compareCommentsCount = (cardA, cardB) => cardB.comments.length - cardA.comments.length;
+
+const getRandomCards = (cards) => {
+  const randomCards = [];
+  const usedIndexes = [];
+  let currentLength = 0;
+  while (currentLength < RANDOM_CARD_LIMIT) {
+    const tryThisIndex = getRandomInteger(0, cards.length - 1);
+    if (usedIndexes.includes(tryThisIndex)) {
+      continue;
+    } else {
+      randomCards.push(cards[tryThisIndex]);
+      usedIndexes.push(tryThisIndex);
+      currentLength++;
+    }
+  }
+  return randomCards;
+};
 
 const filters = {
   default:  (cards) => cards,
-  random: (cards) => cards,
-  discussed: (cards) => cards.sort(compareComments),
+  random: (cards) => getRandomCards(cards),
+  discussed: (cards) => cards.sort(compareCommentsCount),
 };
 
 /**
@@ -17,15 +37,8 @@ const renderThumbs = (images, filter) => {
   const imagesFragment = document.createDocumentFragment();
   const imagesElements = imageContainer.querySelectorAll('.picture');
 
-
   const filteredImages = filters[filter](images);
-  console.log(images);
-  console.log(filteredImages);
-//   var container = document.getElementById("container");
-// var elements = container.getElementsByClassName("deleteme");
 
-
-// imagesElements.forEach((elem) => {elem.innerHTML = ''};)
   filteredImages.forEach(({url, description, likes, comments, id}) => {
     const photoCard = imageTemplate.cloneNode(true);
     const imageElement = photoCard.querySelector('.picture__img');
