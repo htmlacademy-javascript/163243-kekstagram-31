@@ -15,6 +15,9 @@ const sendDataSuccessElement = sendDataSuccessElementTemplate.cloneNode(true);
 const successButtonElement = sendDataSuccessElement.querySelector('.success__button');
 const errorButtonElement = sendDataErrorElement.querySelector('.error__button');
 const imageUploadSubmitButtonElement = document.querySelector('.img-upload__submit');
+const imageFiltersElement = document.querySelector('.img-filters');
+const imageFiltersFormElement = document.querySelector('.img-filters__form');
+
 
 const api = {
   getData : {
@@ -22,7 +25,7 @@ const api = {
     method: 'GET',
     errorText: 'Не удалось загрузить данные. Попробуйте обновить страницу',
     errorElement: getDataErrorElement,
-    action: (data) => renderGallery(data),
+    action: (imagesData, filter) => renderGallery(imagesData, filter),
   },
   sendData : {
     route: '/',
@@ -108,6 +111,14 @@ function documentKeydownHandler(evt) {
   }
 }
 
+const clickFilterHandler = (evt) => {
+  const activeFilter = imageFiltersFormElement.querySelector('.img-filters__button--active');
+  if (activeFilter !== evt.target) {
+    activeFilter.classList.remove('img-filters__button--active');
+    evt.target.classList.add('img-filters__button--active');
+    getData(evt.target.getAttribute('id').split('-')[1]);
+  }
+};
 
 /**
  * Функция, показывающая сообщение об ошибке загрузки данных
@@ -117,6 +128,7 @@ const showDataError = (errorElement) => {
   document.body.appendChild(errorElement);
   if (errorElement === api.getData.errorElement) {
     setTimeout(() => document.body.removeChild(errorElement), TIME_OUT * MILLISECONDS_IN_SECONDS);
+    imageFiltersElement.classList.add('img-filters--inactive');
     return;
   }
   errorButtonElement.addEventListener('click', errorButtonClickHandler);
@@ -142,7 +154,7 @@ function showDataSuccess() {
  * @param {obj} api - destructed - объект API
  * @param {obj} body - обект с данными для отправки на сервер, по умолчанию null
  */
-const sendRequest = ({route, method, errorElement, action}, body = null) => {
+const sendRequest = ({route, method, errorElement, action}, body = null, filter = null) => {
   fetch(`${BACKEND_URL}${route}`, {method, body})
     .then(blockSubmitButton())
     .then((response) => {
@@ -151,12 +163,17 @@ const sendRequest = ({route, method, errorElement, action}, body = null) => {
       }
       return response.json();
     })
-    .then((data) => action(data))
+    .then((data) => action(data, filter))
     .catch(() => showDataError(errorElement))
     .finally(unblockSubmitButton());
 };
 
-const getData = () => sendRequest(api.getData);
+function getData(chosenFilter = 'default') {
+  sendRequest(api.getData, null, chosenFilter);
+  imageFiltersElement.classList.remove('img-filters--inactive');
+  imageFiltersFormElement.addEventListener('click', clickFilterHandler);
+}
+
 const sendData = (body) => sendRequest(api.sendData, body);
 
 export { getData, sendData };

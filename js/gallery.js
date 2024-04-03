@@ -18,8 +18,8 @@ const thumbClick = (imagesData, evt) => {
  * @param {array} imagesData - массив с данными фотографий
  * @returns {null}
  */
-const renderGallery = (imagesData) => {
-  const gallery = renderThumbs(imagesData);
+const renderGallery = (imagesData, filter) => {
+  const gallery = renderThumbs(imagesData, filter);
   gallery.addEventListener('click', (evt) => thumbClick(imagesData, evt));
 };
 
