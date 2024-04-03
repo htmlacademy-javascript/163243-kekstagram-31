@@ -1,5 +1,5 @@
 import { renderGallery } from './gallery.js';
-import { isEscapeKey } from './util.js';
+import { isEscapeKey, debounce } from './util.js';
 import { closeImageUploadForm } from './upload-image.js';
 
 const BACKEND_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
@@ -171,7 +171,7 @@ const sendRequest = ({route, method, errorElement, action}, body = null, filter 
 function getData(chosenFilter = 'default') {
   sendRequest(api.getData, null, chosenFilter);
   imageFiltersElement.classList.remove('img-filters--inactive');
-  imageFiltersFormElement.addEventListener('click', clickFilterHandler);
+  imageFiltersFormElement.addEventListener('click', debounce(clickFilterHandler));
 }
 
 const sendData = (body) => sendRequest(api.sendData, body);
