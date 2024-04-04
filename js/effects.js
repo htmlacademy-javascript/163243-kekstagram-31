@@ -1,17 +1,17 @@
 const sliderElement = document.querySelector('.effect-level__slider');
 const sliderValueElement = document.querySelector('.effect-level__value');
-const imagePreviewElement = document.querySelector('.img-upload__preview');
+const imagePreviewElement = document.querySelector('.img-upload__preview img');
 const effectsListElement = document.querySelector('.effects__list');
 const effectBarElement = document.querySelector('.img-upload__effect-level');
 
 const defaultSliderSettings = { range: { min: 0, max: 1 }, start: 1, step: 0.01, connect: 'lower' };
 
 const EffectsSettings = {
-  chrome: {filter: 'grayscale', range: { min: 0, max: 1 }, start: 1, step: 0.01, unit: '' },
-  sepia:  {filter: 'sepia', range: { min: 0, max: 1 }, start: 1, step: 0.01, unit: '' },
-  marvin: {filter: 'invert', range: { min: 0, max: 1 }, start: 1, step: 0.01,unit: '' },
-  phobos: {filter: 'blur', range: { min: 0, max: 3 }, start: 3, step: 0.01, unit: 'px' },
-  heat:   {filter: 'brightness', range: { min: 1, max: 3 }, start: 3, step: 0.01, unit: '' },
+  chrome: {filter: 'grayscale', range: { min: 0, max: 1 }, start: 1, step: 0.1, unit: '' },
+  sepia:  {filter: 'sepia', range: { min: 0, max: 1 }, start: 1, step: 0.1, unit: '' },
+  marvin: {filter: 'invert', range: { min: 0, max: 100 }, start: 100, step: 1, unit: '%' },
+  phobos: {filter: 'blur', range: { min: 0, max: 3 }, start: 3, step: 0.1, unit: 'px' },
+  heat:   {filter: 'brightness', range: { min: 1, max: 3 }, start: 3, step: 0.1, unit: '' },
 };
 
 /**
