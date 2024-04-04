@@ -135,6 +135,7 @@ const handleImageUpload = () => {
     blockSubmitButton();
     evt.preventDefault();
     if (pristine.validate()) {
+      uploadedImageEditOverlayElement.classList.add('hidden');
       sendData(new FormData(evt.target));
     }
   });

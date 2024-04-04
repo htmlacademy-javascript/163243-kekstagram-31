@@ -75,9 +75,7 @@ const renderComment = (avatar, nickname, commentText) => {
 
 
 /**
- * Функция генерации html элемента блока комментариев
- * @param {array} imageComments - массив с комментариями к конкретной фото
- * @returns {HTMLElement} -  html элемент со списком комментариев
+ * Функция отрисовки блока комментариев
  */
 const renderImageComments = () => {
   clearComments();
