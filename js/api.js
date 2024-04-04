@@ -73,6 +73,7 @@ const closeDataErrorMsg = () => {
   document.removeEventListener('click', documentClickHandler);
   document.body.classList.remove('modal-open');
   uploadedImageEditOverlayElement.classList.remove('hidden');
+  unblockSubmitButton();
 };
 
 /**
@@ -192,6 +193,7 @@ function getData(chosenFilter = 'default') {
  * Функция отправки данных на сервер
  * @param {obj} body - объект с отправляемыми данными
  */
-const sendData = (body) => sendRequest(api.sendData, body);
+const sendData = (body) => sendRequest(api.sendData, body)
+  .then(() => blockSubmitButton());
 
 export { getData, sendData, blockSubmitButton };
