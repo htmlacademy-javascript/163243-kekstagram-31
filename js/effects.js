@@ -9,7 +9,7 @@ const defaultSliderSettings = { range: { min: 0, max: 1 }, start: 1, step: 0.01,
 const EffectsSettings = {
   chrome: {filter: 'grayscale', range: { min: 0, max: 1 }, start: 1, step: 0.01, unit: '' },
   sepia:  {filter: 'sepia', range: { min: 0, max: 1 }, start: 1, step: 0.01, unit: '' },
-  marvin: {filter: 'invert', range: { min: 0, max: 1 }, start: 1, step: 0.01,unit: '%' },
+  marvin: {filter: 'invert', range: { min: 0, max: 1 }, start: 1, step: 0.01,unit: '' },
   phobos: {filter: 'blur', range: { min: 0, max: 3 }, start: 3, step: 0.01, unit: 'px' },
   heat:   {filter: 'brightness', range: { min: 1, max: 3 }, start: 3, step: 0.01, unit: '' },
 };

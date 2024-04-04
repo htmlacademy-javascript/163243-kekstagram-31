@@ -1,6 +1,10 @@
 import { renderGallery } from './gallery.js';
-import { isEscapeKey } from './util.js';
+import { isEscapeKey, debounce } from './util.js';
 import { closeImageUploadForm } from './upload-image.js';
+
+const BACKEND_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
+const TIME_OUT = 5;
+const MILLISECONDS_IN_SECONDS = 1000;
 
 const getDataErrorElementTemplate = document.querySelector('#data-error').content.querySelector('.data-error');
 const getDataErrorElement = getDataErrorElementTemplate.cloneNode(true);
@@ -11,11 +15,9 @@ const sendDataSuccessElement = sendDataSuccessElementTemplate.cloneNode(true);
 const successButtonElement = sendDataSuccessElement.querySelector('.success__button');
 const errorButtonElement = sendDataErrorElement.querySelector('.error__button');
 const imageUploadSubmitButtonElement = document.querySelector('.img-upload__submit');
+const imageFiltersElement = document.querySelector('.img-filters');
+const imageFiltersFormElement = document.querySelector('.img-filters__form');
 
-
-const BACKEND_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
-const TIME_OUT = 5;
-const MILLISECONDS_IN_SECONDS = 1000;
 
 const api = {
   getData : {
@@ -23,6 +25,7 @@ const api = {
     method: 'GET',
     errorText: 'Не удалось загрузить данные. Попробуйте обновить страницу',
     errorElement: getDataErrorElement,
+    action: (imagesData, filter) => renderGallery(imagesData, filter),
   },
   sendData : {
     route: '/',
@@ -30,6 +33,7 @@ const api = {
     errorText: 'Не удалось загрузить данные. Попробуйте обновить страницу',
     errorElement: sendDataErrorElement,
     successElement: sendDataSuccessElement,
+    action: () => showDataSuccess(),
   },
 };
 
@@ -46,6 +50,7 @@ const blockSubmitButton = () => {
 const unblockSubmitButton = () => {
   imageUploadSubmitButtonElement.disabled = false;
 };
+
 
 /**
  * Функция закрытия сообщения об успешной отправке данных
@@ -85,10 +90,8 @@ const errorButtonClickHandler = () => closeDataErrorMsg();
 function documentClickHandler(evt) {
   if (sendDataSuccessElement.parentNode !== null && !evt.target.matches('.success__inner') && !evt.target.matches('.success__title')) {
     closeDataSuccessMsg();
-  } else {
-    if (sendDataErrorElement.parentNode !== null && !evt.target.matches('.error__inner') && !evt.target.matches('.error__title')) {
-      closeDataErrorMsg();
-    }
+  } else if (sendDataErrorElement.parentNode !== null && !evt.target.matches('.error__inner') && !evt.target.matches('.error__title')) {
+    closeDataErrorMsg();
   }
 }
 
@@ -100,10 +103,26 @@ function documentClickHandler(evt) {
 function documentKeydownHandler(evt) {
   if (isEscapeKey(evt)) {
     evt.preventDefault();
-    const _ = (sendDataSuccessElement.parentNode !== null) ? closeDataSuccessMsg() : closeDataErrorMsg();
+    if (sendDataSuccessElement.parentNode !== null) {
+      closeDataSuccessMsg();
+    } else {
+      closeDataErrorMsg();
+    }
   }
 }
 
+/**
+ * Обработчик нажатия на фильтр
+ * @param {evt} evt - событие
+ */
+const clickFilterHandler = (evt) => {
+  const activeFilter = imageFiltersFormElement.querySelector('.img-filters__button--active');
+  if (activeFilter !== evt.target) {
+    activeFilter.classList.remove('img-filters__button--active');
+    evt.target.classList.add('img-filters__button--active');
+    getData(evt.target.getAttribute('id').split('-')[1]);
+  }
+};
 
 /**
  * Функция, показывающая сообщение об ошибке загрузки данных
@@ -113,6 +132,7 @@ const showDataError = (errorElement) => {
   document.body.appendChild(errorElement);
   if (errorElement === api.getData.errorElement) {
     setTimeout(() => document.body.removeChild(errorElement), TIME_OUT * MILLISECONDS_IN_SECONDS);
+    imageFiltersElement.classList.add('img-filters--inactive');
     return;
   }
   errorButtonElement.addEventListener('click', errorButtonClickHandler);
@@ -124,20 +144,22 @@ const showDataError = (errorElement) => {
 /**
  * Функция, показывающая сообщение об успешной отправке данных на сервер
  */
-const showDataSuccess = () => {
+function showDataSuccess() {
   document.body.appendChild(sendDataSuccessElement);
   successButtonElement.addEventListener('click', successButtonClickHandler);
   document.addEventListener('keydown', documentKeydownHandler);
   document.addEventListener('click', documentClickHandler);
   document.body.classList.add('modal-open');
-};
+}
+
 
 /**
  * Функция отправки запроса на сервер
  * @param {obj} api - destructed - объект API
  * @param {obj} body - обект с данными для отправки на сервер, по умолчанию null
+ * @param {string} - строка со значением фильтра
  */
-const sendRequest = ({route, errorText, method, errorElement}, body = null) => {
+const sendRequest = ({route, method, errorElement, action}, body = null, filter = null) => {
   fetch(`${BACKEND_URL}${route}`, {method, body})
     .then(blockSubmitButton())
     .then((response) => {
@@ -146,17 +168,25 @@ const sendRequest = ({route, errorText, method, errorElement}, body = null) => {
       }
       return response.json();
     })
-    .then((data) => {
-      const _ = (method === api.getData.method) ? renderGallery(data) : showDataSuccess();
-    })
-    .catch(() => {
-      showDataError(errorElement);
-      throw new Error(errorText);
-    })
+    .then((data) => action(data, filter))
+    .catch(() => showDataError(errorElement))
     .finally(unblockSubmitButton());
 };
 
-const getData = () => sendRequest(api.getData);
+/**
+ * Функция получения данных с сервера
+ * @param {string} chosenFilter - строка с установленным фильтром
+ */
+function getData(chosenFilter = 'default') {
+  sendRequest(api.getData, null, chosenFilter);
+  imageFiltersElement.classList.remove('img-filters--inactive');
+  imageFiltersFormElement.addEventListener('click', debounce(clickFilterHandler));
+}
+
+/**
+ * Функция отправки данных на сервер
+ * @param {obj} body - объект с отправляемыми данными
+ */
 const sendData = (body) => sendRequest(api.sendData, body);
 
 export { getData, sendData };

@@ -66,7 +66,7 @@ function closeElementClickHandler() {
 
 
 /**
- * Обработчик нажатия клавиши Esc
+ * Функция обработки нажатия клавиши Esc
  * @param {evt} evt - событие.
  */
 function documentKeydownHandler(evt) {
