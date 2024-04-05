@@ -17,6 +17,7 @@ const errorButtonElement = sendDataErrorElement.querySelector('.error__button');
 const imageUploadSubmitButtonElement = document.querySelector('.img-upload__submit');
 const imageFiltersElement = document.querySelector('.img-filters');
 const imageFiltersFormElement = document.querySelector('.img-filters__form');
+const uploadedImageEditOverlayElement = document.querySelector('.img-upload__overlay');
 
 
 const api = {
@@ -71,6 +72,8 @@ const closeDataErrorMsg = () => {
   document.removeEventListener('keydown', documentKeydownHandler);
   document.removeEventListener('click', documentClickHandler);
   document.body.classList.remove('modal-open');
+  uploadedImageEditOverlayElement.classList.remove('hidden');
+  unblockSubmitButton();
 };
 
 /**
@@ -138,7 +141,7 @@ const showDataError = (errorElement) => {
   errorButtonElement.addEventListener('click', errorButtonClickHandler);
   document.addEventListener('keydown', documentKeydownHandler);
   document.addEventListener('click', documentClickHandler);
-  document.body.classList.add('modal-open');
+  document.body.classList.remove('modal-open');
 };
 
 /**
@@ -149,7 +152,7 @@ function showDataSuccess() {
   successButtonElement.addEventListener('click', successButtonClickHandler);
   document.addEventListener('keydown', documentKeydownHandler);
   document.addEventListener('click', documentClickHandler);
-  document.body.classList.add('modal-open');
+  document.body.classList.remove('modal-open');
 }
 
 
@@ -159,7 +162,7 @@ function showDataSuccess() {
  * @param {obj} body - обект с данными для отправки на сервер, по умолчанию null
  * @param {string} - строка со значением фильтра
  */
-const sendRequest = ({route, method, errorElement, action}, body = null, filter = null) => {
+const sendRequest = ({route, method, errorElement, action}, body = null, filter = null) =>
   fetch(`${BACKEND_URL}${route}`, {method, body})
     .then(blockSubmitButton())
     .then((response) => {
@@ -171,22 +174,26 @@ const sendRequest = ({route, method, errorElement, action}, body = null, filter 
     .then((data) => action(data, filter))
     .catch(() => showDataError(errorElement))
     .finally(unblockSubmitButton());
-};
+
 
 /**
  * Функция получения данных с сервера
  * @param {string} chosenFilter - строка с установленным фильтром
  */
 function getData(chosenFilter = 'default') {
-  sendRequest(api.getData, null, chosenFilter);
-  imageFiltersElement.classList.remove('img-filters--inactive');
-  imageFiltersFormElement.addEventListener('click', debounce(clickFilterHandler));
+  sendRequest(api.getData, null, chosenFilter)
+    .then(() => {
+      imageFiltersElement.classList.remove('img-filters--inactive');
+      imageFiltersFormElement.addEventListener('click', debounce(clickFilterHandler));
+    });
+
 }
 
 /**
  * Функция отправки данных на сервер
  * @param {obj} body - объект с отправляемыми данными
  */
-const sendData = (body) => sendRequest(api.sendData, body);
+const sendData = (body) => sendRequest(api.sendData, body)
+  .then(() => blockSubmitButton());
 
-export { getData, sendData };
+export { getData, sendData, blockSubmitButton };

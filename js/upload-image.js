@@ -1,7 +1,7 @@
 import { isEscapeKey } from './util.js';
 import { handleScale, resetScale } from './scale.js';
 import { handleEffects, resetEffects } from './effects.js';
-import { sendData } from './api.js';
+import { sendData, blockSubmitButton } from './api.js';
 
 const HASHTAGS_COUNT_LIMIT = 5;
 const DESCRIPTION_LENGTH_LIMIT = 140;
@@ -80,7 +80,6 @@ function documentKeydownHandler(evt) {
  * Функция - интерфейс модуля загрузки изображений
  */
 const handleImageUpload = () => {
-
   inputHashtagsElement.addEventListener('input', hashtagChangeHandler);
   inputHashtagsElement.addEventListener('keydown', stopKeydownHandler);
   inputDescriptionElement.addEventListener('keydown', stopKeydownHandler);
@@ -133,8 +132,10 @@ const handleImageUpload = () => {
   validations.forEach(([element, validation, errorText]) => pristine.addValidator(element, validation, errorText));
 
   uploadedImageEditFormElement.addEventListener('submit', (evt) => {
+    blockSubmitButton();
     evt.preventDefault();
     if (pristine.validate()) {
+      uploadedImageEditOverlayElement.classList.add('hidden');
       sendData(new FormData(evt.target));
     }
   });
