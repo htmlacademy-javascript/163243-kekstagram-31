@@ -118,7 +118,7 @@ function documentKeydownHandler(evt) {
  * Обработчик нажатия на фильтр
  * @param {evt} evt - событие
  */
-const clickFilterHandler = (evt) => {
+const filterClickHandler = (evt) => {
   const activeFilter = imageFiltersFormElement.querySelector('.img-filters__button--active');
   if (activeFilter !== evt.target) {
     activeFilter.classList.remove('img-filters__button--active');
@@ -184,7 +184,7 @@ function getData(chosenFilter = 'default') {
   sendRequest(api.getData, null, chosenFilter)
     .then(() => {
       imageFiltersElement.classList.remove('img-filters--inactive');
-      imageFiltersFormElement.addEventListener('click', debounce(clickFilterHandler));
+      imageFiltersFormElement.addEventListener('click', debounce(filterClickHandler));
     });
 
 }
@@ -196,4 +196,4 @@ function getData(chosenFilter = 'default') {
 const sendData = (body) => sendRequest(api.sendData, body)
   .then(() => blockSubmitButton());
 
-export { getData, sendData, blockSubmitButton };
+export { getData, sendData, blockSubmitButton, unblockSubmitButton };

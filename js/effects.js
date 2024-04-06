@@ -17,7 +17,7 @@ const EffectsSettings = {
 /**
  * Иницилиазация слайдера
  */
-const initSlider = () => {
+const initializeSlider = () => {
   const { range, start, step, connect} = defaultSliderSettings;
   noUiSlider.create(sliderElement, { range, start, step, connect,
     format: {
@@ -62,7 +62,7 @@ const setEffect = (selectedEffect) => {
  * Обработчик нажатия на эффект
  * @param {evt} evt - событие
  */
-const effectClickHandler = (evt) => {
+const effectChangeHandler = (evt) => {
   if (evt.target.value === 'none') {
     resetEffects();
     return;
@@ -75,8 +75,8 @@ const effectClickHandler = (evt) => {
  */
 const handleEffects = () => {
   resetEffects();
-  initSlider();
-  effectsListElement.addEventListener('change', effectClickHandler);
+  initializeSlider();
+  effectsListElement.addEventListener('change', effectChangeHandler);
 };
 
 export { handleEffects, resetEffects };
