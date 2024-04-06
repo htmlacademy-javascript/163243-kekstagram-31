@@ -62,7 +62,7 @@ const renderThumbs = (images, filter) => {
     imagesFragment.appendChild(photoCard);
   });
 
-  imagesElements.forEach((elem) => elem.parentElement.removeChild(elem));
+  imagesElements.forEach((imageElement) => imageElement.parentElement.removeChild(imageElement));
   imageContainer.appendChild(imagesFragment);
   return imageContainer;
 };

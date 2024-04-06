@@ -8,7 +8,7 @@ import { renderThumbs } from './render-thumbs.js';
  */
 const thumbClick = (imagesData, evt) => {
   if (evt.target.matches('.picture__img')) {
-    const clickedImageData = imagesData.find((el) => el['id'] === parseInt(evt.target.dataset.id, 10));
+    const clickedImageData = imagesData.find((imageData) => imageData['id'] === parseInt(evt.target.dataset.id, 10));
     fillFullImageData(clickedImageData);
   }
 };

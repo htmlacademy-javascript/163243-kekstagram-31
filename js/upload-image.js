@@ -1,7 +1,7 @@
 import { isEscapeKey } from './util.js';
 import { handleScale, resetScale } from './scale.js';
 import { handleEffects, resetEffects } from './effects.js';
-import { sendData, blockSubmitButton } from './api.js';
+import { sendData, blockSubmitButton, unblockSubmitButton } from './api.js';
 
 const HASHTAGS_COUNT_LIMIT = 5;
 const DESCRIPTION_LENGTH_LIMIT = 140;
@@ -24,22 +24,29 @@ const pristine = new Pristine(uploadedImageEditFormElement, {
 /**
  * Обработчик вводимых хештегов
  */
-const hashtagChangeHandler = () => pristine.validate();
+const hashtagInputHandler = () => pristine.validate();
 
 /**
  * Обработчик нажатия клавиш
  * @param {evt} evt - событие
  */
-const stopKeydownHandler = (evt) => evt.stopPropagation();
+const hashtagKeydownHandler = (evt) => evt.stopPropagation();
+
+/**
+ * Обработчик нажатия клавиш
+ * @param {evt} evt - событие
+ */
+const descriptionKeydownHandler = (evt) => evt.stopPropagation();
 
 /**
  * Обработчки события загрузки изображения
  */
-const uploadImageHandler = () => {
+const uploadImageChangeHandler = () => {
   uploadedImageEditOverlayElement.classList.remove('hidden');
   document.body.classList.add('modal-open');
   closeUploadedImageEditFormElement.addEventListener('click', closeElementClickHandler);
   document.addEventListener('keydown', documentKeydownHandler);
+  unblockSubmitButton();
 };
 
 
@@ -80,12 +87,13 @@ function documentKeydownHandler(evt) {
  * Функция - интерфейс модуля загрузки изображений
  */
 const handleImageUpload = () => {
-  inputHashtagsElement.addEventListener('input', hashtagChangeHandler);
-  inputHashtagsElement.addEventListener('keydown', stopKeydownHandler);
-  inputDescriptionElement.addEventListener('keydown', stopKeydownHandler);
-  imageUploadElement.addEventListener('change', uploadImageHandler);
+  inputHashtagsElement.addEventListener('input', hashtagInputHandler);
+  inputHashtagsElement.addEventListener('keydown', hashtagKeydownHandler);
+  inputDescriptionElement.addEventListener('keydown', descriptionKeydownHandler);
+  imageUploadElement.addEventListener('change', uploadImageChangeHandler);
 
-  let clearedHashtagsToValidate = [];
+  let clearedHashtags = [];
+
 
   /**
    * Валидация хештегов на соответвтие регулярному выражению
@@ -94,8 +102,8 @@ const handleImageUpload = () => {
    */
   const validateHashtagsRegexp = (hashtags) => {
     const hashtagsToValidate = hashtags.trim().toLowerCase().split(' ');
-    clearedHashtagsToValidate = hashtagsToValidate.filter(Boolean);
-    return clearedHashtagsToValidate.every((hashtag) => HASHTAG_REGEXP.test(hashtag));
+    clearedHashtags = hashtagsToValidate.filter(Boolean);
+    return clearedHashtags.every((hashtag) => HASHTAG_REGEXP.test(hashtag));
   };
 
   /**
@@ -103,8 +111,8 @@ const handleImageUpload = () => {
  * @returns {boolean} - правда, если дубликатов нет, иначе - ложь
  */
   const validateHashtagsDuplicates = () => {
-    if (clearedHashtagsToValidate) {
-      const duplicates = clearedHashtagsToValidate.filter((element, index, elements) => elements.indexOf(element) !== index);
+    if (clearedHashtags) {
+      const duplicates = clearedHashtags.filter((element, index, elements) => elements.indexOf(element) !== index);
       return !duplicates.length;
     }
   };
@@ -113,7 +121,7 @@ const handleImageUpload = () => {
    * Проверка количества хештегов
    * @returns {boolean} - правда, если менее, чем положено, иначе - ложь
    */
-  const validateHashtagsCount = () => clearedHashtagsToValidate.length <= HASHTAGS_COUNT_LIMIT;
+  const validateHashtagsCount = () => clearedHashtags.length <= HASHTAGS_COUNT_LIMIT;
 
   /**
    * Проверка длины описания
@@ -132,9 +140,9 @@ const handleImageUpload = () => {
   validations.forEach(([element, validation, errorText]) => pristine.addValidator(element, validation, errorText));
 
   uploadedImageEditFormElement.addEventListener('submit', (evt) => {
-    blockSubmitButton();
     evt.preventDefault();
     if (pristine.validate()) {
+      blockSubmitButton();
       uploadedImageEditOverlayElement.classList.add('hidden');
       sendData(new FormData(evt.target));
     }
