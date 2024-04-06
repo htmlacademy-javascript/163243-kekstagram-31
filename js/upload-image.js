@@ -41,7 +41,7 @@ const descriptionKeydownHandler = (evt) => evt.stopPropagation();
 /**
  * Обработчки события загрузки изображения
  */
-const uploadImageChangeHandler = () => {
+const imageUploadChangeHandler = () => {
   uploadedImageEditOverlayElement.classList.remove('hidden');
   document.body.classList.add('modal-open');
   closeUploadedImageEditFormElement.addEventListener('click', closeElementClickHandler);
@@ -90,7 +90,7 @@ const handleImageUpload = () => {
   inputHashtagsElement.addEventListener('input', hashtagInputHandler);
   inputHashtagsElement.addEventListener('keydown', hashtagKeydownHandler);
   inputDescriptionElement.addEventListener('keydown', descriptionKeydownHandler);
-  imageUploadElement.addEventListener('change', uploadImageChangeHandler);
+  imageUploadElement.addEventListener('change', imageUploadChangeHandler);
 
   let clearedHashtags = [];
 
